@@ -10,7 +10,7 @@ chatbot_on_AIPC/
 |   |-- models/ov_inference.py
 |   `-- utils/             # download and conversion helpers
 |-- static/                # index.html, chat.js, style.css
-|-- models/                # OpenVINO IR files live here
+|-- model/                 # OpenVINO IR files live here
 |-- config.json            # runtime settings
 |-- run.py                 # convenience launcher
 `-- requirements.txt       # Python dependencies
@@ -19,8 +19,8 @@ chatbot_on_AIPC/
 ## 2. Startup Flow
 1. `run.py` loads `config.json`, resolves the target device (NPU > GPU > CPU), and starts Uvicorn.
 2. `app/main.py` creates the FastAPI app, mounts static files, and registers the chat routes.
-3. `model_manager.py` checks for model files in `models/`; if absent it raises an informative error for the user.
-4. `ov_inference.py` loads the OpenVINO model, keeps it in memory, and exposes a `generate` helper that returns a single string response.
+3. `model_manager.py` checks for model files in `model/`; if absent it raises an informative error for the user.
+4. `ov_inference.py` uses the OpenVINO GenAI pipeline (LLM pipeline), keeps it in memory, and exposes a `generate` helper that returns a single string response.
 
 ## 3. Backend Components
 - **main.py**: builds the FastAPI application, sets up CORS, serves `static/index.html`, and wires the REST router.
@@ -41,7 +41,7 @@ Returns application status and device information.
 {
   "status": "ok",
   "model_loaded": true,
-  "device": "NPU"
+  "device": "AUTO:NPU,GPU,CPU"
 }
 ```
 
@@ -71,7 +71,7 @@ Validation keeps the payload small (e.g., prompt length, positive numeric settin
 {
   "model": {
     "name": "OpenVINO/DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov",
-    "local_dir": "models",
+    "local_dir": "model",
     "max_context_length": 8192
   },
   "inference": {
@@ -98,7 +98,8 @@ Environment variables or CLI flags can override the server host/port if desired.
 > Encoding note: keep `config.json` saved as UTF-8 without a byte order mark. Editors such as VS Code allow choosing `UTF-8` (not `UTF-8 with BOM`). If the file already contains a BOM, run `python -c "import pathlib; p = pathlib.Path('config.json'); p.write_text(p.read_text(encoding='utf-8-sig'), encoding='utf-8')"` to normalize it.
 
 ## 7. Model Handling
-- Place `openvino_model.bin` and `openvino_model.xml` inside `models/`.
+- Place the OpenVINO snapshot inside `model/` (or update `config.json -> model.local_dir`).
+- Required files include `openvino_model.(xml|bin)`, `openvino_tokenizer.(xml|bin)`, `openvino_detokenizer.(xml|bin)`.
 - Large model snapshots from Hugging Face should be downloaded once and reused.
 - Loading happens lazily on the first request; subsequent requests reuse the same compiled model.
 
