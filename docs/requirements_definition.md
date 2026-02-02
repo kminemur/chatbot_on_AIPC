@@ -17,7 +17,7 @@
 - Keep the conversation history in the current browser session and allow clearing it
 
 ### 3.2 Model Management
-- When the OpenVINO model files are missing, guide the user to place them under `models/`
+- When the OpenVINO model files are missing, guide the user to place them under `model/`
 - Reuse locally cached models to avoid repeated downloads
 
 ### 3.3 Configuration
@@ -38,8 +38,10 @@
 ## 6. Setup Flow
 1. Clone the repository and create a Python virtual environment
 2. Install dependencies with `pip install -r requirements.txt`
-3. Download the OpenVINO model (e.g., via Hugging Face CLI) and place it in `models/`
+3. Download the OpenVINO model (e.g., via Hugging Face CLI) and place it in `model/`
 4. Run `python run.py` and open the site in a browser
+
+See `docs/setup.md` for copy/paste commands.
 
 ## 7. Possible Future Enhancements
 - Persist conversation history (e.g., SQLite)
