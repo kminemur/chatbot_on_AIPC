@@ -1,115 +1,61 @@
-# Chatbot on AI PC Technical Notes
+# Technical Specification
 
-## 1. Repository Layout
-```
-chatbot_on_AIPC/
-|-- app/
-|   |-- main.py            # FastAPI entry point
-|   |-- api/chat.py        # REST endpoints
-|   |-- models/model_manager.py
-|   |-- models/ov_inference.py
-|   `-- utils/             # download and conversion helpers
-|-- static/                # index.html, chat.js, style.css
-|-- model/                 # OpenVINO IR files live here
-|-- config.json            # runtime settings
-|-- run.py                 # convenience launcher
-`-- requirements.txt       # Python dependencies
-```
+## Objective
+Provide a local chat app that serves a simple browser UI and runs OpenVINO inference on Intel AI PC hardware.
 
-## 2. Startup Flow
-1. `run.py` loads `config.json`, resolves the target device (NPU > GPU > CPU), and starts Uvicorn.
-2. `app/main.py` creates the FastAPI app, mounts static files, and registers the chat routes.
-3. `model_manager.py` checks for model files in `model/`; if absent it raises an informative error for the user.
-4. `ov_inference.py` uses the OpenVINO GenAI pipeline (LLM pipeline), keeps it in memory, and exposes a `generate` helper that returns a single string response.
+## Main Components
+- `run.py`: reads `config.json`, resolves the device, starts Uvicorn
+- `app/main.py`: creates the FastAPI app and serves static files
+- `app/api/chat.py`: exposes `POST /api/chat`
+- `app/models/model_manager.py`: resolves the model path and caches state
+- `app/models/ov_inference.py`: performs OpenVINO generation
+- `static/`: browser client
 
-## 3. Backend Components
-- **main.py**: builds the FastAPI application, sets up CORS, serves `static/index.html`, and wires the REST router.
-- **api/chat.py**: exposes `POST /api/chat` and `GET /health`. The chat endpoint validates the request, calls the inference helper, and returns the final text plus timing info.
-- **models/model_manager.py**: handles model path resolution, basic caching, and exposes a singleton-like accessor so the model loads only once.
-- **models/ov_inference.py**: wraps OpenVINO Runtime. It prepares the compiled model, runs generation with max tokens, temperature, top-p, and repetition penalty values taken from the config.
-- **utils/download.py** (optional use): helper functions to fetch model artifacts from Hugging Face when needed.
+## Expected Startup Flow
+1. Load `config.json`
+2. Resolve device priority as NPU, then GPU, then CPU
+3. Start FastAPI with Uvicorn
+4. Load model lazily on first inference request
 
-## 4. Frontend Components
-- **static/index.html**: minimal chat page with an input box, send button, and message list.
-- **static/chat.js**: submits prompts via `fetch` to `/api/chat`, appends the response, and maintains session memory in the browser only.
-- **static/style.css**: light styling for desktop use; responsive tweaks keep the layout usable on smaller screens.
-
-## 5. API Contract
-### 5.1 `GET /health`
-Returns application status and device information.
+## API Contract
+`GET /health`
 ```json
-{
-  "status": "ok",
-  "model_loaded": true,
-  "device": "AUTO:NPU,GPU,CPU"
-}
+{"status":"ok","model_loaded":true,"device":"AUTO:NPU,GPU,CPU"}
 ```
 
-### 5.2 `POST /api/chat`
-Accepts a single prompt and returns the completed answer (no token streaming).
+`POST /api/chat`
 ```json
-// Request
-{
-  "message": "Hello!",
-  "max_tokens": 512,
-  "temperature": 0.7,
-  "top_p": 0.9
-}
-
-// Response
-{
-  "response": "Hi there, how can I help you?",
-  "inference_time": 2.14,
-  "tokens_generated": 120
-}
+{"message":"Hello","max_tokens":512,"temperature":0.7,"top_p":0.9}
 ```
-Validation keeps the payload small (e.g., prompt length, positive numeric settings) and falls back to defaults when optional fields are omitted.
 
-## 6. Configuration
-`config.json` drives model metadata and inference defaults.
+Response:
 ```json
-{
-  "model": {
-    "name": "OpenVINO/DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov",
-    "local_dir": "model",
-    "max_context_length": 8192
-  },
-  "inference": {
-    "max_tokens": 512,
-    "temperature": 0.7,
-    "top_p": 0.9,
-    "top_k": 50,
-    "repetition_penalty": 1.05
-  },
-  "server": {
-    "host": "127.0.0.1",
-    "port": 8000,
-    "log_level": "info"
-  },
-  "hardware": {
-    "preferred_device": "NPU",
-    "fallback_order": ["GPU", "CPU"],
-    "precision": "FP16"
-  }
-}
+{"response":"Hi","inference_time":2.14,"tokens_generated":120}
 ```
-Environment variables or CLI flags can override the server host/port if desired.
 
-> Encoding note: keep `config.json` saved as UTF-8 without a byte order mark. Editors such as VS Code allow choosing `UTF-8` (not `UTF-8 with BOM`). If the file already contains a BOM, run `python -c "import pathlib; p = pathlib.Path('config.json'); p.write_text(p.read_text(encoding='utf-8-sig'), encoding='utf-8')"` to normalize it.
+## Config Contract
+`config.json` should contain:
+- `model.name`
+- `model.local_dir`
+- `model.max_context_length`
+- `inference.max_tokens`
+- `inference.temperature`
+- `inference.top_p`
+- `inference.top_k`
+- `inference.repetition_penalty`
+- `server.host`
+- `server.port`
+- `server.log_level`
+- `hardware.preferred_device`
+- `hardware.fallback_order`
 
-## 7. Model Handling
-- Place the OpenVINO snapshot inside `model/` (or update `config.json -> model.local_dir`).
-- Required files include `openvino_model.(xml|bin)`, `openvino_tokenizer.(xml|bin)`, `openvino_detokenizer.(xml|bin)`.
-- Large model snapshots from Hugging Face should be downloaded once and reused.
-- Loading happens lazily on the first request; subsequent requests reuse the same compiled model.
+## Constraints
+- Windows-first
+- Local-only execution
+- No streaming is required
+- Keep the frontend simple
 
-## 8. Dependency Highlights
-- FastAPI 0.110+
-- OpenVINO Runtime with NPU support
-- optimum-intel for model conversions (if needed)
-- transformers for tokenizer utilities
-
-## 9. Testing Checklist
-- Unit test model loading and generation helpers (e.g., mock the runtime for quick feedback).
-- Hit `GET /health` to verify the service starts and the model is ready.
-- Send a sample prompt to `/api/chat` and confirm the response arrives as a single JSON payload.
+## Guidance For The Next AI Agent
+- Do not assume setup automation exists unless it is implemented in the repo.
+- Prefer updating `run.py`, `config.json`, and `docs/` together when behavior changes.
+- Keep the API stable unless the docs are updated in the same change.
