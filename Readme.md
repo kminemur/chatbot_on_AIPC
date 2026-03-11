@@ -12,6 +12,40 @@ Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 - Browser UI
 - Single-response chat API
 - Local model loading from `model/`
+- Lazy OpenVINO model initialization on first chat request
+- Clear runtime errors for missing model files or missing OpenVINO packages
+
+## One-Command Setup
+`setup.bat` is part of the product surface, not a convenience script. Another AI agent should be able to recreate it from the docs without reverse-engineering shell behavior.
+
+Required behavior:
+- Run from the repository root on Windows `cmd.exe`
+- Detect Python 3.10-3.12 from `py -3` or `python`
+- Create `.venv` if it does not exist
+- Use `.venv\Scripts\python.exe` for all later package installs and helper scripts
+- Install `requirements.txt`
+- Read `model.local_dir` from `config.json`
+- Succeed immediately if all required model files already exist in that directory
+- If model files are missing, accept one optional source argument
+- Treat the source as a local directory if it exists
+- Otherwise treat the source as a Hugging Face repo id and download only the required model files
+- Exit with a clear usage message if model files are missing and no source argument is provided
+- Print actionable error messages and return a non-zero exit code on failure
+
+If the model files already exist:
+```powershell
+setup.bat
+```
+
+If you want setup to copy a local OpenVINO model folder into `model/`:
+```powershell
+setup.bat C:\models\DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov
+```
+
+If you want setup to download a Hugging Face snapshot into `model/`:
+```powershell
+setup.bat OpenVINO/DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov
+```
 
 ## Run Manually
 Requirements:
@@ -45,6 +79,17 @@ python run.py
 Open:
 - UI: `http://127.0.0.1:8000/`
 - Health: `http://127.0.0.1:8000/health`
+- Chat API: `POST http://127.0.0.1:8000/api/chat`
+
+Sample request:
+```json
+{"message":"Hello","max_tokens":256,"temperature":0.7,"top_p":0.9}
+```
+
+Sample response:
+```json
+{"response":"Hi","inference_time":2.14,"tokens_generated":120}
+```
 
 ## For The Next AI Agent
 Read these files first:
@@ -52,4 +97,4 @@ Read these files first:
 - `docs/technical_specification.md`
 - `docs/setup.md`
 
-The docs are intentionally short and implementation-focused so another agent can continue work without re-deriving requirements.
+For `setup.bat`, do not rely on fragile inline quoting when reading `config.json`. Prefer calling a small Python helper script from the venv instead of embedding a long `python -c` expression inside `for /f`.
