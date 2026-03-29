@@ -54,7 +54,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate
 python -m pip install --upgrade pip wheel
 pip install -r requirements.txt
-python run.py
+run.bat
 ```
 
 ## Model Folder
@@ -76,4 +76,5 @@ Required files:
 - Run from the repository root.
 - Save `config.json` as UTF-8 without BOM.
 - `setup.bat` reads `model.local_dir` from `config.json`.
+- `run.bat` starts the app with `.venv\Scripts\python.exe`.
 - If the model files are missing and no source is provided, `setup.bat` exits with usage help.
