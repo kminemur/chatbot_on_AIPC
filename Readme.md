@@ -25,14 +25,16 @@ Required behavior:
 - Use `.venv\Scripts\python.exe` for all later package installs and helper scripts
 - Install `requirements.txt`
 - Read `model.local_dir` from `config.json`
+- Read `model.download_source` from `config.json`
 - Succeed immediately if all required model files already exist in that directory
+- If model files are missing and no argument is provided, download from the configured default source
 - If model files are missing, accept one optional source argument
 - Treat the source as a local directory if it exists
 - Otherwise treat the source as a Hugging Face repo id and download only the required model files
-- Exit with a clear usage message if model files are missing and no source argument is provided
+- Exit with a clear usage message if model files are missing and no source is available
 - Print actionable error messages and return a non-zero exit code on failure
 
-If the model files already exist:
+If the model files already exist, or if they are missing and should be downloaded from the default source:
 ```powershell
 setup.bat
 ```
@@ -75,6 +77,17 @@ Run:
 ```powershell
 run.bat
 ```
+
+Main files:
+- `config.json`
+- `run.py`
+- `app/`
+- `static/`
+- `scripts/print_model_dir.py`
+- `scripts/print_model_download_source.py`
+- `scripts/download_model.py`
+- `setup.bat`
+- `run.bat`
 
 Open:
 - UI: `http://127.0.0.1:8000/`
