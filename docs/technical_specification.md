@@ -7,6 +7,7 @@ Provide a local chat app that serves a simple browser UI and runs OpenVINO infer
 - `setup.bat`: creates `.venv`, installs packages, and prepares the model directory
 - `run.bat`: starts the app with `.venv\Scripts\python.exe`
 - `scripts/print_model_dir.py`: prints `model.local_dir` from `config.json` for Windows-safe batch integration
+- `scripts/print_model_download_source.py`: prints `model.download_source` from `config.json`
 - `run.py`: reads `config.json`, resolves the device, starts Uvicorn
 - `app/main.py`: creates the FastAPI app and serves static files
 - `app/api/chat.py`: exposes `POST /api/chat`
@@ -37,11 +38,12 @@ Required sequence:
 7. Resolve `model.local_dir` from `config.json`
 8. Check whether the model directory already contains all six required OpenVINO files
 9. If complete, exit successfully
-10. If incomplete and no source argument was passed, print usage and exit non-zero
-11. If a source argument was passed:
-12. Copy from that directory when it exists locally
-13. Otherwise download from Hugging Face into the configured model directory
-14. Validate the required files again and fail clearly if they are still missing
+10. If incomplete and no source argument was passed, resolve `model.download_source` from `config.json`
+11. If no source argument was passed and no default source is configured, print usage and exit non-zero
+12. If a source argument was passed, it overrides `model.download_source`
+13. Copy from that directory when it exists locally
+14. Otherwise download from Hugging Face into the configured model directory
+15. Validate the required files again and fail clearly if they are still missing
 
 Implementation guidance:
 - Avoid shell activation. The script should work without `call .venv\Scripts\activate`
@@ -70,6 +72,7 @@ Response:
 `config.json` should contain:
 - `model.name`
 - `model.local_dir`
+- `model.download_source`
 - `model.max_context_length`
 - `inference.max_tokens`
 - `inference.temperature`
