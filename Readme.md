@@ -73,7 +73,7 @@ Required files:
 
 Run:
 ```powershell
-python run.py
+run.bat
 ```
 
 Open:
