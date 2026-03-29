@@ -5,6 +5,7 @@ Provide a local chat app that serves a simple browser UI and runs OpenVINO infer
 
 ## Main Components
 - `setup.bat`: creates `.venv`, installs packages, and prepares the model directory
+- `run.bat`: starts the app with `.venv\Scripts\python.exe`
 - `scripts/print_model_dir.py`: prints `model.local_dir` from `config.json` for Windows-safe batch integration
 - `run.py`: reads `config.json`, resolves the device, starts Uvicorn
 - `app/main.py`: creates the FastAPI app and serves static files
@@ -16,11 +17,12 @@ Provide a local chat app that serves a simple browser UI and runs OpenVINO infer
 - `config.json`: stores model, inference, server, and hardware defaults
 
 ## Expected Startup Flow
-1. Load `config.json`
-2. Resolve device priority as NPU, then GPU, then CPU
-3. Start FastAPI with Uvicorn
-4. Load model lazily on first inference request
-5. Return a 500 error with a clear message if the model directory or OpenVINO runtime is not ready
+1. `run.bat` changes to the repository root and uses `.venv\Scripts\python.exe`
+2. `run.py` loads `config.json`
+3. Resolve device priority as NPU, then GPU, then CPU
+4. Start FastAPI with Uvicorn
+5. Load model lazily on first inference request
+6. Return a 500 error with a clear message if the model directory or OpenVINO runtime is not ready
 
 ## `setup.bat` Contract
 The setup script is Windows-first and must be implementable by another AI agent from this file alone.
