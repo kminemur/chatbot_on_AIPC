@@ -88,3 +88,4 @@ Required files:
 - `setup.bat` reads `model.download_source` from `config.json`.
 - `run.bat` starts the app with `.venv\Scripts\python.exe`.
 - If the model files are missing and no source is provided, `setup.bat` downloads from `model.download_source`.
+- User-visible responses must not display internal reasoning markers such as `think` or `<think>...</think>`.

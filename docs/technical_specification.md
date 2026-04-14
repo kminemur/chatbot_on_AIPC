@@ -23,7 +23,8 @@ Provide a local chat app that serves a simple browser UI and runs OpenVINO infer
 3. Resolve device priority as NPU, then GPU, then CPU
 4. Start FastAPI with Uvicorn
 5. Load model lazily on first inference request
-6. Return a 500 error with a clear message if the model directory or OpenVINO runtime is not ready
+6. Strip internal reasoning markers such as `think` or `<think>...</think>` from generated text before sending the response
+7. Return a 500 error with a clear message if the model directory or OpenVINO runtime is not ready
 
 ## `setup.bat` Contract
 The setup script is Windows-first and must be implementable by another AI agent from this file alone.
@@ -68,6 +69,10 @@ Response:
 {"response":"Hi","inference_time":2.14,"tokens_generated":120}
 ```
 
+Response rules:
+- `response` contains only the user-facing answer text
+- Internal reasoning text, reasoning tags, or debug sections such as `think` and `<think>...</think>` must not be returned by the API
+
 ## Config Contract
 `config.json` should contain:
 - `model.name`
@@ -90,6 +95,7 @@ Response:
 - Local-only execution
 - No streaming is required
 - Keep the frontend simple
+- Do not expose chain-of-thought style output in the UI or API
 
 ## Guidance For The Next AI Agent
 - `setup.bat` is required behavior, not optional tooling.

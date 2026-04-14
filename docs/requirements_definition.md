@@ -7,6 +7,7 @@ Build a local chatbot for Intel AI PC that runs an OpenVINO model and exposes a 
 - Serve the UI on `http://127.0.0.1:8000/`
 - Accept one chat message per request
 - Return one complete response per request
+- Never expose internal reasoning text or tags such as `think` to the user
 - Expose a health endpoint
 - Load model files from a local directory
 - Read inference defaults from `config.json`
@@ -36,6 +37,7 @@ Build a local chatbot for Intel AI PC that runs an OpenVINO model and exposes a 
 - `python run.py` starts the server from repo root
 - `GET /health` returns status and device info
 - `POST /api/chat` returns JSON with response text and timing
+- `POST /api/chat` returns only user-facing answer text and excludes internal reasoning markers such as `think` or `<think>...</think>`
 - Missing model files produce a clear error
 - The browser UI can submit a message to `POST /api/chat`
 

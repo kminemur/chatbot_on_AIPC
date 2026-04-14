@@ -3,7 +3,7 @@
 Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 
 ## Purpose
-- Run `OpenVINO/Qwen3-8B-int4-cw-ov` locally.
+- Run `OpenVINO/gemma-7b-int4-ov` locally.
 - Prefer NPU, but allow GPU or CPU fallback.
 - Keep all chat data on the local machine.
 
@@ -14,6 +14,7 @@ Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 - Local model loading from `model/`
 - Lazy OpenVINO model initialization on first chat request
 - Clear runtime errors for missing model files or missing OpenVINO packages
+- Do not display internal reasoning or tags such as `think` in the UI or API response
 
 ## One-Command Setup
 `setup.bat` is part of the product surface, not a convenience script. Another AI agent should be able to recreate it from the docs without reverse-engineering shell behavior.
@@ -103,6 +104,10 @@ Sample response:
 ```json
 {"response":"Hi","inference_time":2.14,"tokens_generated":120}
 ```
+
+Response rule:
+- Return only the user-facing answer text in `response`
+- Strip internal reasoning markers or sections such as `think`, `<think>...</think>`, or similar debug output before returning text
 
 ## For The Next AI Agent
 Read these files first:
