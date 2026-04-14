@@ -3,7 +3,7 @@
 Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 
 ## Purpose
-- Run `DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov` locally.
+- Run `OpenVINO/Qwen3-8B-int4-cw-ov` locally.
 - Prefer NPU, but allow GPU or CPU fallback.
 - Keep all chat data on the local machine.
 
