@@ -90,6 +90,10 @@ Response rules:
 - `hardware.preferred_device`
 - `hardware.fallback_order`
 
+Default model values:
+- `model.name = "SakanaAI/TinySwallow-1.5B-Instruct"`
+- `model.download_source = "SakanaAI/TinySwallow-1.5B-Instruct"`
+
 ## Constraints
 - Windows-first
 - Local-only execution

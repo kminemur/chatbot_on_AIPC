@@ -1,0 +1,26 @@
+{
+  "model": {
+    "name": "SakanaAI/TinySwallow-1.5B-Instruct",
+    "local_dir": "model",
+    "download_source": "SakanaAI/TinySwallow-1.5B-Instruct",
+    "max_context_length": 4096
+  },
+  "inference": {
+    "max_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.1
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000,
+    "log_level": "info"
+  },
+  "hardware": {
+    "preferred_device": "GPU",
+    "fallback_order": [
+      "CPU"
+    ]
+  }
+}

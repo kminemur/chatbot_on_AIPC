@@ -22,12 +22,12 @@ setup.bat
 
 If you want to copy from a local OpenVINO model folder:
 ```powershell
-setup.bat C:\models\DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov
+setup.bat C:\models\TinySwallow-1.5B-Instruct
 ```
 
 If you want to download from Hugging Face:
 ```powershell
-setup.bat OpenVINO/DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov
+setup.bat SakanaAI/TinySwallow-1.5B-Instruct
 ```
 
 ## What `setup.bat` Must Do
@@ -68,6 +68,7 @@ run.bat
 
 ## Model Folder
 The app expects the model under `model/` unless `config.json` says otherwise.
+The default model source is `SakanaAI/TinySwallow-1.5B-Instruct`.
 
 Required files:
 - `openvino_model.xml`

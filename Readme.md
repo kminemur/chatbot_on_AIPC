@@ -3,7 +3,7 @@
 Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 
 ## Purpose
-- Run `OpenVINO/gemma-7b-int4-ov` locally.
+- Run `SakanaAI/TinySwallow-1.5B-Instruct` locally.
 - Use GPU inference by default, with CPU fallback when needed.
 - Keep all chat data on the local machine.
 
@@ -42,12 +42,12 @@ setup.bat
 
 If you want setup to copy a local OpenVINO model folder into `model/`:
 ```powershell
-setup.bat C:\models\DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov
+setup.bat C:\models\TinySwallow-1.5B-Instruct
 ```
 
 If you want setup to download a Hugging Face snapshot into `model/`:
 ```powershell
-setup.bat OpenVINO/DeepSeek-R1-Distill-Qwen-1.5B-int4-cw-ov
+setup.bat SakanaAI/TinySwallow-1.5B-Instruct
 ```
 
 ## Run Manually
@@ -65,7 +65,13 @@ pip install -r requirements.txt
 ```
 
 Model:
-Place the OpenVINO model snapshot in `model/`.
+Place the model snapshot in `model/`, or use the default `model.download_source` in `config.json`:
+`SakanaAI/TinySwallow-1.5B-Instruct`
+
+Required configuration:
+- `model.name`: `SakanaAI/TinySwallow-1.5B-Instruct`
+- `model.download_source`: `SakanaAI/TinySwallow-1.5B-Instruct`
+
 Required files:
 - `openvino_model.xml`
 - `openvino_model.bin`
