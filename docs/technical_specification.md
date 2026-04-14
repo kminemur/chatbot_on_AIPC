@@ -20,7 +20,7 @@ Provide a local chat app that serves a simple browser UI and runs OpenVINO infer
 ## Expected Startup Flow
 1. `run.bat` changes to the repository root and uses `.venv\Scripts\python.exe`
 2. `run.py` loads `config.json`
-3. Resolve device priority as NPU, then GPU, then CPU
+3. Resolve the default device as GPU and fall back to CPU when GPU is unavailable
 4. Start FastAPI with Uvicorn
 5. Load model lazily on first inference request
 6. Strip internal reasoning markers such as `think` or `<think>...</think>` from generated text before sending the response
@@ -56,7 +56,7 @@ Implementation guidance:
 ## API Contract
 `GET /health`
 ```json
-{"status":"ok","model_loaded":true,"device":"AUTO:NPU,GPU,CPU"}
+{"status":"ok","model_loaded":true,"device":"AUTO:GPU,CPU"}
 ```
 
 `POST /api/chat`

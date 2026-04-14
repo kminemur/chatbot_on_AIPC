@@ -4,7 +4,7 @@ Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 
 ## Purpose
 - Run `OpenVINO/gemma-7b-int4-ov` locally.
-- Prefer NPU, but allow GPU or CPU fallback.
+- Use GPU inference by default, with CPU fallback when needed.
 - Keep all chat data on the local machine.
 
 ## Current Scope
@@ -78,6 +78,10 @@ Run:
 ```powershell
 run.bat
 ```
+
+Inference device:
+- Default: GPU
+- Fallback: CPU
 
 Main files:
 - `config.json`

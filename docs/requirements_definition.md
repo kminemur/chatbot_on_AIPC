@@ -16,7 +16,7 @@ Build a local chatbot for Intel AI PC that runs an OpenVINO model and exposes a 
 ## Non-Functional Requirements
 - Run on Windows 10/11
 - Support Python 3.10-3.12
-- Prefer NPU, allow GPU and CPU fallback
+- Use GPU as the default inference device and allow CPU fallback
 - Avoid cloud dependencies during inference
 - Keep docs short and implementation-directed
 
