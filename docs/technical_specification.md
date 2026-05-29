@@ -32,7 +32,7 @@ The setup script is Windows-first and must be implementable by another AI agent 
 Required sequence:
 1. `cd` to the repository root using `%~dp0`
 2. Detect Python using `py -3` first, then `python`
-3. Validate that the detected interpreter is between Python 3.10 and 3.12
+3. Validate that the detected interpreter is Python 3.12 or later
 4. Create `.venv` if `.venv\Scripts\python.exe` does not exist
 5. Use `.venv\Scripts\python.exe` for `pip install` and all helper script invocations
 6. Install `requirements.txt`

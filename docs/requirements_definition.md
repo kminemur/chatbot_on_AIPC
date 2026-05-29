@@ -15,7 +15,7 @@ Build a local chatbot for Intel AI PC that runs an OpenVINO model and exposes a 
 
 ## Non-Functional Requirements
 - Run on Windows 10/11
-- Support Python 3.10-3.12
+- Support Python 3.12 or later
 - Use GPU as the default inference device and allow CPU fallback
 - Avoid cloud dependencies during inference
 - Keep docs short and implementation-directed
@@ -30,7 +30,7 @@ Build a local chatbot for Intel AI PC that runs an OpenVINO model and exposes a 
 - `setup.bat` prepares the Python environment from the repo root
 - `setup.bat <source>` can populate the configured model directory from a local folder or Hugging Face repo
 - `setup.bat` without arguments auto-downloads from `config.json` when model files are missing
-- `setup.bat` detects Python from `py -3` or `python` and rejects versions outside 3.10-3.12
+- `setup.bat` detects Python from `py -3` or `python` and rejects versions earlier than 3.12
 - `setup.bat` uses `.venv\Scripts\python.exe` after virtualenv creation instead of relying on shell activation
 - `setup.bat` reads `model.local_dir` from `config.json` through a helper script or another implementation that is robust on Windows batch
 - `setup.bat` prints usage help only when model files are missing and neither an argument nor `model.download_source` is available

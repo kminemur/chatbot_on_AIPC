@@ -4,7 +4,7 @@ This file is for human operators. It describes the current setup flow.
 
 ## Requirements
 - Windows 10/11
-- Python 3.10-3.12
+- Python 3.12 or later
 - About 10 GB free disk space
 
 ## One-Command Setup

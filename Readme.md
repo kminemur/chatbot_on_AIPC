@@ -21,7 +21,7 @@ Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 
 Required behavior:
 - Run from the repository root on Windows `cmd.exe`
-- Detect Python 3.10-3.12 from `py -3` or `python`
+- Detect Python 3.12 or later from `py -3` or `python`
 - Create `.venv` if it does not exist
 - Use `.venv\Scripts\python.exe` for all later package installs and helper scripts
 - Install `requirements.txt`
@@ -53,7 +53,7 @@ setup.bat SakanaAI/TinySwallow-1.5B-Instruct
 ## Run Manually
 Requirements:
 - Windows 10/11
-- Python 3.10-3.12
+- Python 3.12 or later
 - About 10 GB free disk space
 
 Setup:
