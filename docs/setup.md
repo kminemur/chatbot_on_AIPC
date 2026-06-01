@@ -5,6 +5,7 @@ This file is for human operators. It describes the current setup flow.
 ## Requirements
 - Windows 10/11
 - Python 3.12 or later
+- uv
 - About 10 GB free disk space
 
 ## One-Command Setup
@@ -34,9 +35,9 @@ setup.bat SakanaAI/TinySwallow-1.5B-Instruct
 - Start from the repository root
 - Detect Python from `py -3` or `python`
 - Reject unsupported Python versions
-- Create `.venv` when needed
-- Use `.venv\Scripts\python.exe` for package installation and helper scripts
-- Install the packages in `requirements.txt`
+- Require `uv`
+- Run `uv sync` to create or update `.venv` from `pyproject.toml`
+- Use `.venv\Scripts\python.exe` for helper scripts
 - Read `model.local_dir` from `config.json`
 - Read `model.download_source` from `config.json`
 - Check these required files in that directory:
@@ -59,10 +60,7 @@ setup.bat SakanaAI/TinySwallow-1.5B-Instruct
 
 ## Manual Steps
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate
-python -m pip install --upgrade pip wheel
-pip install -r requirements.txt
+uv sync
 run.bat
 ```
 
@@ -87,6 +85,7 @@ Required files:
 - Save `config.json` as UTF-8 without BOM.
 - `setup.bat` reads `model.local_dir` from `config.json`.
 - `setup.bat` reads `model.download_source` from `config.json`.
+- `setup.bat` prepares the Python environment by running `uv sync`.
 - `run.bat` starts the app with `.venv\Scripts\python.exe`.
 - If the model files are missing and no source is provided, `setup.bat` downloads from `model.download_source`.
 - User-visible responses must not display internal reasoning markers such as `think` or `<think>...</think>`.

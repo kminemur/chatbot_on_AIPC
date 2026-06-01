@@ -4,7 +4,7 @@
 Provide a local chat app that serves a simple browser UI and runs OpenVINO inference on Intel AI PC hardware.
 
 ## Main Components
-- `setup.bat`: creates `.venv`, installs packages, and prepares the model directory
+- `setup.bat`: runs `uv sync` and prepares the model directory
 - `run.bat`: starts the app with `.venv\Scripts\python.exe`
 - `scripts/print_model_dir.py`: prints `model.local_dir` from `config.json` for Windows-safe batch integration
 - `scripts/print_model_download_source.py`: prints `model.download_source` from `config.json`
@@ -33,9 +33,9 @@ Required sequence:
 1. `cd` to the repository root using `%~dp0`
 2. Detect Python using `py -3` first, then `python`
 3. Validate that the detected interpreter is Python 3.12 or later
-4. Create `.venv` if `.venv\Scripts\python.exe` does not exist
-5. Use `.venv\Scripts\python.exe` for `pip install` and all helper script invocations
-6. Install `requirements.txt`
+4. Require `uv`
+5. Run `uv sync` to create or update `.venv` from `pyproject.toml`
+6. Use `.venv\Scripts\python.exe` for all helper script invocations
 7. Resolve `model.local_dir` from `config.json`
 8. Check whether the model directory already contains all six required OpenVINO files
 9. If complete, exit successfully

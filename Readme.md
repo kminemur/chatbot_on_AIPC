@@ -22,9 +22,9 @@ Local chatbot for Intel AI PC using OpenVINO and a browser UI.
 Required behavior:
 - Run from the repository root on Windows `cmd.exe`
 - Detect Python 3.12 or later from `py -3` or `python`
-- Create `.venv` if it does not exist
-- Use `.venv\Scripts\python.exe` for all later package installs and helper scripts
-- Install `requirements.txt`
+- Require `uv`
+- Run `uv sync` to create or update `.venv` from `pyproject.toml`
+- Use `.venv\Scripts\python.exe` for all later helper scripts
 - Read `model.local_dir` from `config.json`
 - Read `model.download_source` from `config.json`
 - Succeed immediately if all required model files already exist in that directory
@@ -54,14 +54,12 @@ setup.bat SakanaAI/TinySwallow-1.5B-Instruct
 Requirements:
 - Windows 10/11
 - Python 3.12 or later
+- uv
 - About 10 GB free disk space
 
 Setup:
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate
-python -m pip install --upgrade pip wheel
-pip install -r requirements.txt
+uv sync
 ```
 
 Model:
@@ -91,6 +89,8 @@ Inference device:
 
 Main files:
 - `config.json`
+- `pyproject.toml`
+- `uv.lock`
 - `run.py`
 - `app/`
 - `static/`
