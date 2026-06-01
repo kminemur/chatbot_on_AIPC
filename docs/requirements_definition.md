@@ -1,45 +1,41 @@
 # Requirements Definition
 
-## Product Goal
-Build a local chatbot for Intel AI PC that runs an OpenVINO model and exposes a small browser UI.
+## Goal
+Intel AI PC 上で、OpenVINO モデルをローカル実行する小さなチャットアプリを作る。
 
-## Functional Requirements
-- Serve the UI on `http://127.0.0.1:8000/`
-- Accept one chat message per request
-- Return one complete response per request
-- Never expose internal reasoning text or tags such as `think` to the user
-- Expose a health endpoint
-- Load model files from a local directory
-- Read inference defaults from `config.json`
-- Provide a Windows `setup.bat` that can prepare both the Python environment with `uv sync` and the model directory
+## Must Have
+- Windows 10/11 で動く
+- Python 3.12+ と `uv` を使う
+- `setup.bat` だけで `.venv` とモデルを準備できる
+- `run.bat` で `http://127.0.0.1:8000/` を起動できる
+- ブラウザ UI から 1 メッセージを送信できる
+- `POST /api/chat` が 1 回の完全な回答を JSON で返す
+- `GET /health` が状態と device を返す
+- 推論はローカルで行い、チャット内容をクラウドへ送らない
+- GPU を優先し、使えない場合は CPU に fallback する
+- `think`, `<think>...</think>`, `reasoning:` などの内部推論表示を API/UI に出さない
 
-## Non-Functional Requirements
-- Run on Windows 10/11
-- Support Python 3.12 or later
-- Use GPU as the default inference device and allow CPU fallback
-- Avoid cloud dependencies during inference
-- Keep docs short and implementation-directed
+## Keep Out
+- ユーザー認証
+- クラウド同期
+- 複雑な frontend framework
+- streaming response
+- 複数会話履歴の永続化
 
-## Non-Goals
-- Multi-user auth
-- Cloud sync
-- Complex frontend framework
-- Streaming tokens
-
-## Acceptance Criteria
-- `setup.bat` prepares the Python environment from the repo root by running `uv sync`
-- `setup.bat <source>` can populate the configured model directory from a local folder or Hugging Face repo
-- `setup.bat` without arguments auto-downloads from `config.json` when model files are missing
-- `setup.bat` detects Python from `py -3` or `python` and rejects versions earlier than 3.12
-- `setup.bat` uses `.venv\Scripts\python.exe` after `uv sync` instead of relying on shell activation
-- `setup.bat` reads `model.local_dir` from `config.json` through a helper script or another implementation that is robust on Windows batch
-- `setup.bat` prints usage help only when model files are missing and neither an argument nor `model.download_source` is available
-- `python run.py` starts the server from repo root
-- `GET /health` returns status and device info
-- `POST /api/chat` returns JSON with response text and timing
-- `POST /api/chat` returns only user-facing answer text and excludes internal reasoning markers such as `think` or `<think>...</think>`
-- Missing model files produce a clear error
-- The browser UI can submit a message to `POST /api/chat`
+## Acceptance Checks
+- `setup.bat` が repo root から成功する
+- `setup.bat <local_dir>` がローカル OpenVINO モデルを `model.local_dir` にコピーできる
+- `setup.bat <hf_repo>` が Hugging Face repo からモデルを準備できる
+- Hugging Face repo に OpenVINO ファイルがない場合、ローカル変換で必須ファイルを生成できる
+- `.venv\Scripts\python.exe scripts\check_model_files.py model` が成功する
+- `run.bat` でサーバーが起動する
+- `GET /health` が `status`, `model_loaded`, `device` を返す
+- `POST /api/chat` が `response`, `inference_time`, `tokens_generated` を返す
+- モデルファイル不足時は不足ファイル名を含む明確なエラーを返す
 
 ## Handoff Rule
-When the next AI agent changes behavior, it must update this file, `docs/technical_specification.md`, and `Readme.md` in the same task.
+仕様や挙動を変えたら、同じタスクで次を更新する。
+- `Readme.md`
+- `docs/requirements_definition.md`
+- `docs/technical_specification.md`
+- 必要なら `docs/setup.md`

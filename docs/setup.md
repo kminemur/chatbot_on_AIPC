@@ -1,74 +1,45 @@
 # Setup
 
-This file is for human operators. It describes the current setup flow.
+`setup.bat` はこのプロジェクトの標準セットアップ手順です。手作業で venv を activate したり、モデルファイルを個別にコピーしたりしなくてよい状態を目指します。
 
-## Requirements
-- Windows 10/11
-- Python 3.12 or later
-- uv
-- About 10 GB free disk space
-
-## One-Command Setup
-The purpose of `setup.bat` is to let a human or an AI agent prepare this repo from a plain Windows terminal without manually activating environments or copying files by hand.
-
-If the model is already in the configured folder:
-```powershell
+## User Flow
+標準:
+```bat
 setup.bat
-```
-
-If the model is missing, `setup.bat` downloads from the default Hugging Face repo in `config.json`:
-```powershell
-setup.bat
-```
-
-If you want to copy from a local OpenVINO model folder:
-```powershell
-setup.bat C:\models\TinySwallow-1.5B-Instruct
-```
-
-If you want to download from Hugging Face:
-```powershell
-setup.bat SakanaAI/TinySwallow-1.5B-Instruct
-```
-
-## What `setup.bat` Must Do
-- Start from the repository root
-- Detect Python from `py -3` or `python`
-- Reject unsupported Python versions
-- Require `uv`
-- Run `uv sync` to create or update `.venv` from `pyproject.toml`
-- Use `.venv\Scripts\python.exe` for helper scripts
-- Read `model.local_dir` from `config.json`
-- Read `model.download_source` from `config.json`
-- Check these required files in that directory:
-  `openvino_model.xml`, `openvino_model.bin`, `openvino_tokenizer.xml`, `openvino_tokenizer.bin`, `openvino_detokenizer.xml`, `openvino_detokenizer.bin`
-- Exit successfully if the files already exist
-- If files are missing and no argument is provided:
-  download from the default Hugging Face repo in `model.download_source`
-- If files are missing and an argument is provided:
-  treat an existing path as a local model folder, otherwise treat it as a Hugging Face repo id
-- If files are missing and no argument is provided and no default source is configured:
-  exit non-zero and print a short usage message
-
-## Implementation Notes For AI Agents
-- Windows batch quoting around `for /f` and `python -c` is fragile
-- Prefer a helper Python script that prints one value, such as the configured model directory
-- Use helper scripts for both model directory and default download source to avoid fragile quoting
-- Do not require `activate`; calling the venv Python directly is the stable path
-- Validate the model directory after copy or download, not only before
-- Keep stdout human-readable because this script is the first thing operators will run
-
-## Manual Steps
-```powershell
-uv sync
 run.bat
 ```
 
-## Model Folder
-The app expects the model under `model/` unless `config.json` says otherwise.
-The default model source is `SakanaAI/TinySwallow-1.5B-Instruct`.
+ローカルの OpenVINO モデルを使う:
+```bat
+setup.bat C:\models\TinySwallow-1.5B-Instruct
+```
 
-Required files:
+任意の Hugging Face repo を使う:
+```bat
+setup.bat SakanaAI/TinySwallow-1.5B-Instruct
+```
+
+## Setup Contract
+`setup.bat` は repo root から実行される前提で、次の順に処理します。
+
+1. `%~dp0` に `cd`
+2. `py -3`、なければ `python` で Python 3.12+ を探す
+3. `uv` がなければ失敗
+4. `uv sync`
+5. `.venv\Scripts\python.exe` を以後の Python として使う
+6. `scripts\print_model_dir.py` で `model.local_dir` を読む
+7. `scripts\check_model_files.py` でモデル必須ファイルを確認
+8. そろっていれば成功終了
+9. 引数があればそれを source にする
+10. 引数がなければ `scripts\print_model_download_source.py` で default source を読む
+11. source が空なら usage を出して失敗
+12. source が既存ディレクトリなら必須ファイルをコピー
+13. それ以外は Hugging Face repo として扱う
+14. repo に OpenVINO ファイルがあれば取得
+15. なければ `optimum-cli export openvino` でローカル変換
+16. 最後に必須ファイルを再確認し、足りなければ失敗
+
+## Required Model Files
 - `openvino_model.xml`
 - `openvino_model.bin`
 - `openvino_tokenizer.xml`
@@ -76,16 +47,9 @@ Required files:
 - `openvino_detokenizer.xml`
 - `openvino_detokenizer.bin`
 
-## URLs
-- `http://127.0.0.1:8000/`
-- `http://127.0.0.1:8000/health`
-
-## Notes
-- Run from the repository root.
-- Save `config.json` as UTF-8 without BOM.
-- `setup.bat` reads `model.local_dir` from `config.json`.
-- `setup.bat` reads `model.download_source` from `config.json`.
-- `setup.bat` prepares the Python environment by running `uv sync`.
-- `run.bat` starts the app with `.venv\Scripts\python.exe`.
-- If the model files are missing and no source is provided, `setup.bat` downloads from `model.download_source`.
-- User-visible responses must not display internal reasoning markers such as `think` or `<think>...</think>`.
+## Implementation Notes
+- `activate` に依存しない
+- batch 内の長い `python -c` は避ける
+- config 読み取りは小さな Python helper に寄せる
+- stdout は短く、次に何をすればよいか分かる文にする
+- 失敗時は non-zero exit code を返す
