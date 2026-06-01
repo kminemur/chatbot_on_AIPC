@@ -2,7 +2,7 @@
 
 ## Architecture
 - `run.bat` starts `.venv\Scripts\python.exe run.py`
-- `run.py` loads `config.json` and starts Uvicorn
+- `run.py` loads `config.json`, finds an available port, and starts Uvicorn
 - `app/main.py` creates FastAPI, mounts `static/`, and registers API routes
 - `app/api/chat.py` exposes chat endpoints
 - `app/models/model_manager.py` resolves model path, validates files, and lazy-loads inference
@@ -14,11 +14,12 @@ Keep the app small. Add files only when they remove real complexity.
 ## Runtime Flow
 1. User runs `run.bat`
 2. App loads `config.json`
-3. Device selection prefers GPU, then fallback devices
-4. Server starts before loading the model
-5. First chat request validates `model.local_dir`
-6. OpenVINO GenAI pipeline is created lazily
-7. Generated text is cleaned before returning to the user
+3. App starts from `server.port` and uses the next available port if needed
+4. Device selection prefers GPU, then fallback devices
+5. Server starts before loading the model
+6. First chat request validates `model.local_dir`
+7. OpenVINO GenAI pipeline is created lazily
+8. Generated text is cleaned before returning to the user
 
 ## Setup Flow
 Detailed setup behavior lives in `docs/setup.md`.
@@ -29,6 +30,14 @@ Implementation requirements:
 - Use `.venv\Scripts\python.exe` after `uv sync`
 - Do not depend on shell activation
 - Validate model files after every copy/download/export path
+- Keep Windows batch logic shallow; JSON reads, Hugging Face download, file copying, and OpenVINO export belong in Python helpers
+- Export missing Hugging Face models with `optimum-cli export openvino --task text-generation-with-past`
+
+Setup helper responsibilities:
+- `scripts/print_model_dir.py`: print `model.local_dir` from `config.json`
+- `scripts/print_model_download_source.py`: print `model.download_source` from `config.json`
+- `scripts/check_model_files.py`: validate the required OpenVINO files and report missing names
+- `scripts/prepare_model.py`: copy a local OpenVINO directory, download matching OpenVINO files from Hugging Face, or export with `optimum-cli`
 
 ## Config Contract
 `config.json`:
@@ -60,6 +69,8 @@ Implementation requirements:
 ```
 
 Relative paths in config are resolved from repo root.
+
+`server.port` is the preferred starting port. If it is already in use, startup tries the next ports in order.
 
 ## API Contract
 `GET /health`
