@@ -9,6 +9,10 @@ Requirements:
 - `uv`
 - 空き容量 10 GB 以上
 
+Library note:
+- `OpenVINO/gemma-4-E4B-it-int8-ov` は experimental model のため、Gemma 4 対応ブランチの `optimum-intel` と `transformers==5.5.0` を使います。
+- ライブラリ方針は `docs/libraries.md` を参照してください。
+
 Setup:
 ```bat
 setup.bat
@@ -83,7 +87,8 @@ Rules:
 最初に読む順番:
 1. `docs/requirements_definition.md`
 2. `docs/technical_specification.md`
-3. `docs/setup.md`
+3. `docs/libraries.md`
+4. `docs/setup.md`
 
 実装方針:
 - 速く作るため、構成を増やさない

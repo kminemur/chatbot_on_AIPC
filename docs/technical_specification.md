@@ -6,7 +6,7 @@
 - `app/main.py` creates FastAPI, mounts `static/`, and registers API routes
 - `app/api/chat.py` exposes chat endpoints
 - `app/models/model_manager.py` resolves model path, validates files, and lazy-loads inference
-- `app/models/ov_inference.py` wraps OpenVINO GenAI
+- `app/models/ov_inference.py` wraps Optimum Intel OpenVINO inference
 - `scripts/` contains setup helpers used by `setup.bat`
 
 Keep the app small. Add files only when they remove real complexity.
@@ -18,7 +18,7 @@ Keep the app small. Add files only when they remove real complexity.
 4. Device selection prefers GPU, then fallback devices
 5. Server starts before loading the model
 6. First chat request validates `model.local_dir`
-7. OpenVINO GenAI pipeline is created lazily
+7. Optimum Intel OpenVINO model and processor are created lazily
 8. Generated text is cleaned before returning to the user
 
 ## Setup Flow
@@ -32,6 +32,7 @@ Implementation requirements:
 - Validate model files after every copy/download/export path
 - Keep Windows batch logic shallow; JSON reads, Hugging Face download, file copying, and OpenVINO export belong in Python helpers
 - Export missing Hugging Face models with `optimum-cli export openvino --task text-generation-with-past`
+- Runtime library details live in `docs/libraries.md`
 
 Setup helper responsibilities:
 - `scripts/print_model_dir.py`: print `model.local_dir` from `config.json`
@@ -101,6 +102,15 @@ The configured model directory must contain:
 - `openvino_tokenizer.bin`
 - `openvino_detokenizer.xml`
 - `openvino_detokenizer.bin`
+
+## Library Contract
+`OpenVINO/gemma-4-E4B-it-int8-ov` is loaded through Optimum Intel, not `openvino-genai`.
+
+The supported runtime imports are:
+- `from optimum.intel.openvino import OVModelForVisualCausalLM`
+- `from transformers import AutoProcessor`
+
+The project depends on the Gemma 4 support branch of `optimum-intel` and pins `transformers==5.5.0`. Do not replace this with the public PyPI `optimum-intel` constraint unless the model card confirms that Gemma 4 support has landed in a released version.
 
 ## Change Rule
 When behavior changes:
