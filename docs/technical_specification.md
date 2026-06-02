@@ -31,7 +31,7 @@ Implementation requirements:
 - Do not depend on shell activation
 - Validate model files after every copy/download/export path
 - Keep Windows batch logic shallow; JSON reads, Hugging Face download, file copying, and OpenVINO export belong in Python helpers
-- Export missing Hugging Face models with `optimum-cli export openvino --task text-generation-with-past`
+- Export missing Hugging Face models with `optimum-cli export openvino --task image-text-to-text`
 - Runtime library details live in `docs/libraries.md`
 
 Setup helper responsibilities:
@@ -96,12 +96,26 @@ Rules:
 
 ## Model Contract
 The configured model directory must contain:
-- `openvino_model.xml`
-- `openvino_model.bin`
+- `chat_template.jinja`
+- `config.json`
+- `generation_config.json`
+- `openvino_config.json`
 - `openvino_tokenizer.xml`
 - `openvino_tokenizer.bin`
 - `openvino_detokenizer.xml`
 - `openvino_detokenizer.bin`
+- `openvino_language_model.xml`
+- `openvino_language_model.bin`
+- `openvino_text_embeddings_model.xml`
+- `openvino_text_embeddings_model.bin`
+- `openvino_text_embeddings_per_layer_model.xml`
+- `openvino_text_embeddings_per_layer_model.bin`
+- `openvino_vision_embeddings_model.xml`
+- `openvino_vision_embeddings_model.bin`
+- `preprocessor_config.json`
+- `processor_config.json`
+- `tokenizer.json`
+- `tokenizer_config.json`
 
 ## Library Contract
 `OpenVINO/gemma-4-E4B-it-int8-ov` is loaded through Optimum Intel, not `openvino-genai`.

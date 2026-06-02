@@ -51,13 +51,7 @@ setup.bat OpenVINO/gemma-4-E4B-it-int8-ov
 
 標準設定では `OpenVINO/gemma-4-E4B-it-int8-ov` を使います。
 
-必須ファイル:
-- `openvino_model.xml`
-- `openvino_model.bin`
-- `openvino_tokenizer.xml`
-- `openvino_tokenizer.bin`
-- `openvino_detokenizer.xml`
-- `openvino_detokenizer.bin`
+必須ファイルの詳細は `docs/setup.md` を参照してください。Gemma 4 OpenVINO repo では `openvino_language_model.*`、text/vision embeddings、processor/tokenizer 設定をまとめて取得します。
 
 ## API
 `POST /api/chat`
