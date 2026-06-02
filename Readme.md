@@ -13,14 +13,19 @@ Library note:
 - `OpenVINO/gemma-4-E4B-it-int8-ov` は experimental model のため、Gemma 4 対応ブランチの `optimum-intel` と `transformers==5.5.0` を使います。
 - ライブラリ方針は `docs/libraries.md` を参照してください。
 
-Setup:
+Install dependencies:
 ```bat
-setup.bat
+uv sync
 ```
 
-Run:
+Download model:
 ```bat
-run.bat
+uv run python download.py
+```
+
+Run app:
+```bat
+uv run python run.py
 ```
 
 Open:
@@ -29,11 +34,10 @@ Open:
 
 `8000` が使用中の場合は、`8001` 以降の空きポートで自動起動します。
 
-## Model Setup
-通常は `setup.bat` だけで十分です。
+## Model Download
+通常は `uv run python download.py` だけで十分です。
 
-`setup.bat` は次を行います:
-- `uv sync` で `.venv` を作成/更新
+`download.py` は次を行います:
 - `config.json` の `model.local_dir` を読む
 - `model/` に OpenVINO 形式の必須ファイルがあるか確認
 - なければ `model.download_source` から準備
@@ -41,12 +45,12 @@ Open:
 
 ローカルに変換済みモデルがある場合:
 ```bat
-setup.bat C:\models\gemma-4-E4B-it-int8-ov
+uv run python download.py C:\models\gemma-4-E4B-it-int8-ov
 ```
 
 別の Hugging Face repo を使う場合:
 ```bat
-setup.bat OpenVINO/gemma-4-E4B-it-int8-ov
+uv run python download.py OpenVINO/gemma-4-E4B-it-int8-ov
 ```
 
 標準設定では `OpenVINO/gemma-4-E4B-it-int8-ov` を使います。
@@ -69,8 +73,8 @@ Rules:
 - `think`, `<think>...</think>`, `reasoning:` などの内部推論表示は UI/API に出さない
 
 ## Project Map
-- `setup.bat`: 依存関係とモデルを準備
-- `run.bat`: アプリ起動
+- `download.py`: モデルを準備
+- `run.py`: アプリ起動
 - `config.json`: モデル、推論、サーバー、デバイス設定
 - `app/`: FastAPI backend
 - `static/`: browser UI
@@ -86,5 +90,5 @@ Rules:
 
 実装方針:
 - 速く作るため、構成を増やさない
-- Windows batch の複雑な quoting は避け、Python helper script を使う
+- Python helper script でモデル準備の処理を小さく保つ
 - 変更した仕様は同じタスクで docs と README に反映する

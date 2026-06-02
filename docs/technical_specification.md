@@ -1,18 +1,19 @@
 # Technical Specification
 
 ## Architecture
-- `run.bat` starts `.venv\Scripts\python.exe run.py`
+- `uv run python run.py` starts the app
 - `run.py` loads `config.json`, finds an available port, and starts Uvicorn
 - `app/main.py` creates FastAPI, mounts `static/`, and registers API routes
 - `app/api/chat.py` exposes chat endpoints
 - `app/models/model_manager.py` resolves model path, validates files, and lazy-loads inference
 - `app/models/ov_inference.py` wraps Optimum Intel OpenVINO inference
-- `scripts/` contains setup helpers used by `setup.bat`
+- `download.py` prepares the configured model
+- `scripts/` contains model preparation helpers used by `download.py`
 
 Keep the app small. Add files only when they remove real complexity.
 
 ## Runtime Flow
-1. User runs `run.bat`
+1. User runs `uv run python run.py`
 2. App loads `config.json`
 3. App starts from `server.port` and uses the next available port if needed
 4. Device selection prefers GPU, then fallback devices
@@ -25,16 +26,18 @@ Keep the app small. Add files only when they remove real complexity.
 Detailed setup behavior lives in `docs/setup.md`.
 
 Implementation requirements:
-- `setup.bat` is the supported setup entry point
+- `uv sync` is the supported dependency setup command
+- `uv run python download.py` is the supported model setup entry point
 - Use helper scripts for config reads and model validation
-- Use `.venv\Scripts\python.exe` after `uv sync`
+- Use `uv run python ...` after `uv sync`
 - Do not depend on shell activation
 - Validate model files after every copy/download/export path
-- Keep Windows batch logic shallow; JSON reads, Hugging Face download, file copying, and OpenVINO export belong in Python helpers
+- Keep command-line entry points shallow; JSON reads, Hugging Face download, file copying, and OpenVINO export belong in Python helpers
 - Export missing Hugging Face models with `optimum-cli export openvino --task image-text-to-text`
 - Runtime library details live in `docs/libraries.md`
 
-Setup helper responsibilities:
+Download helper responsibilities:
+- `download.py`: read config, choose source, skip existing complete models, copy/download/export the model, and validate output
 - `scripts/print_model_dir.py`: print `model.local_dir` from `config.json`
 - `scripts/print_model_download_source.py`: print `model.download_source` from `config.json`
 - `scripts/check_model_files.py`: validate the required OpenVINO files and report missing names
