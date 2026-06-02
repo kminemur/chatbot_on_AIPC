@@ -14,5 +14,10 @@ dependencies = [
     "torch>=2.0.0",
     "torchvision>=0.15.0",
     "Pillow>=10.0.0",
-    "huggingface_hub>=0.28.0,<1.0.0",
+    "huggingface_hub>=1.5.0,<2.0.0",
+]
+
+[tool.uv]
+override-dependencies = [
+    "transformers==5.5.0",
 ]

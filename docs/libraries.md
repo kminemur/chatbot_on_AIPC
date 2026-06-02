@@ -13,7 +13,9 @@
 - `torch`
 - `torchvision`
 - `Pillow`
-- `huggingface_hub`
+- `huggingface_hub>=1.5.0,<2.0.0`
+
+`support_gemma_4` ブランチの package metadata は `transformers <5.1` のままですが、モデルカードの実行手順は `transformers==5.5.0` を指定しています。その差分を uv に明示するため、`pyproject.toml` の `[tool.uv]` で `override-dependencies = ["transformers==5.5.0"]` を設定します。
 
 `openvino-genai` はこのモデルの標準実行経路には使いません。`LLMPipeline` 前提のコードやドキュメントは追加しないでください。
 
