@@ -44,9 +44,9 @@ Setup helper responsibilities:
 ```json
 {
   "model": {
-    "name": "SakanaAI/TinySwallow-1.5B-Instruct",
+    "name": "OpenVINO/gemma-4-E4B-it-int8-ov",
     "local_dir": "model",
-    "download_source": "SakanaAI/TinySwallow-1.5B-Instruct",
+    "download_source": "OpenVINO/gemma-4-E4B-it-int8-ov",
     "max_context_length": 4096
   },
   "inference": {

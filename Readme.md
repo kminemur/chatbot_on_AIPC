@@ -1,6 +1,6 @@
 # Chatbot on AI PC
 
-Windows AI PC 向けのローカルチャットアプリです。FastAPI でブラウザ UI を出し、OpenVINO GenAI で `SakanaAI/TinySwallow-1.5B-Instruct` を実行します。
+Windows AI PC 向けのローカルチャットアプリです。FastAPI でブラウザ UI を出し、OpenVINO で `OpenVINO/gemma-4-E4B-it-int8-ov` を実行します。
 
 ## Quick Start
 Requirements:
@@ -37,13 +37,15 @@ Open:
 
 ローカルに変換済みモデルがある場合:
 ```bat
-setup.bat C:\models\TinySwallow-1.5B-Instruct
+setup.bat C:\models\gemma-4-E4B-it-int8-ov
 ```
 
 別の Hugging Face repo を使う場合:
 ```bat
-setup.bat SakanaAI/TinySwallow-1.5B-Instruct
+setup.bat OpenVINO/gemma-4-E4B-it-int8-ov
 ```
+
+標準設定では `OpenVINO/gemma-4-E4B-it-int8-ov` を使います。
 
 必須ファイル:
 - `openvino_model.xml`

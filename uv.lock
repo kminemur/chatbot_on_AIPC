@@ -142,9 +142,9 @@ requires-dist = [
     { name = "huggingface-hub", specifier = ">=0.28.0,<1.0.0" },
     { name = "openvino", specifier = ">=2026.2.0" },
     { name = "openvino-genai", specifier = ">=2026.2.0.0" },
-    { name = "optimum-intel", specifier = ">=1.18.0,<2.0.0" },
+    { name = "optimum-intel", specifier = ">=1.27.0,<2.0.0" },
     { name = "pydantic", specifier = ">=2.5.0,<3.0.0" },
-    { name = "transformers", specifier = ">=4.40.0,<5.0.0" },
+    { name = "transformers", specifier = ">=4.45.0,<4.58.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.27.0,<1.0.0" },
 ]
 
