@@ -1,94 +1,173 @@
 # Chatbot on AI PC
 
-Windows AI PC 向けのローカルチャットアプリです。FastAPI でブラウザ UI を出し、OpenVINO で `OpenVINO/gemma-4-E4B-it-int8-ov` を実行します。
+Windows AI PC 上で動く、ローカル実行の小さなチャットアプリです。ブラウザからメッセージを送り、OpenVINO で動かした `OpenVINO/gemma-4-E4B-it-int8-ov` が回答します。チャット内容をクラウドへ送信しないことを前提にしています。
 
-## Quick Start
-Requirements:
+## 特徴
+
+- Windows 10/11 向け
+- Python 3.12+ と `uv` でセットアップ
+- FastAPI + Uvicorn によるローカル Web サーバー
+- 静的なブラウザ UI
+- OpenVINO + Optimum Intel + Transformers によるローカル推論
+- GPU を優先し、利用できない場合は CPU にフォールバック
+- API と UI には内部推論マーカーを表示しない
+
+## 必要なもの
+
 - Windows 10/11
-- Python 3.12+
+- Python 3.12 以降
 - `uv`
-- 空き容量 10 GB 以上
+- モデル保存用の空き容量
 
-Library note:
-- `OpenVINO/gemma-4-E4B-it-int8-ov` は experimental model のため、Gemma 4 対応ブランチの `optimum-intel` と `transformers==5.5.0` を使います。
-- ライブラリ方針は `docs/libraries.md` を参照してください。
+初回セットアップでは依存関係とモデルファイルを取得します。ネットワーク接続が必要になるのはセットアップ時です。通常のチャット推論はローカルで実行します。
 
-Install dependencies:
+## クイックスタート
+
+依存関係をインストールします。
+
 ```bat
 uv sync
 ```
 
-Download model:
+モデルを準備します。
+
 ```bat
 uv run python download.py
 ```
 
-Run app:
+アプリを起動します。
+
 ```bat
 uv run python run.py
 ```
 
-Open:
-- UI: 起動ログに表示された URL。通常は `http://127.0.0.1:8000/`
-- Health: 起動ログに表示された URL + `/health`
+起動ログに表示された URL をブラウザで開きます。標準設定では `http://127.0.0.1:8000/` から開始します。`8000` が使用中の場合は、次の空きポートを探して起動します。
 
-`8000` が使用中の場合は、`8001` 以降の空きポートで自動起動します。
+## モデルの準備
 
-## Model Download
-通常は `uv run python download.py` だけで十分です。
+標準設定では `config.json` の内容に従い、`OpenVINO/gemma-4-E4B-it-int8-ov` を `model/` に準備します。
 
-`download.py` は次を行います:
-- `config.json` の `model.local_dir` を読む
-- `model/` に OpenVINO 形式の必須ファイルがあるか確認
-- なければ `model.download_source` から準備
-- Hugging Face 側に OpenVINO ファイルがなければ `optimum-cli export openvino` でローカル変換
+```bat
+uv run python download.py
+```
 
-ローカルに変換済みモデルがある場合:
+変換済みのローカル OpenVINO モデルを使う場合は、モデルディレクトリを指定します。
+
 ```bat
 uv run python download.py C:\models\gemma-4-E4B-it-int8-ov
 ```
 
-別の Hugging Face repo を使う場合:
+別の Hugging Face リポジトリを指定することもできます。
+
 ```bat
 uv run python download.py OpenVINO/gemma-4-E4B-it-int8-ov
 ```
 
-標準設定では `OpenVINO/gemma-4-E4B-it-int8-ov` を使います。
+モデル準備では、OpenVINO 形式に必要なファイルがそろっているかを確認します。Hugging Face 側に OpenVINO ファイルがない場合は、`optimum-cli export openvino --task image-text-to-text` による変換を行う方針です。
 
-必須ファイルの詳細は `docs/setup.md` を参照してください。Gemma 4 OpenVINO repo では `openvino_language_model.*`、text/vision embeddings、processor/tokenizer 設定をまとめて取得します。
+## 設定
+
+主な設定は `config.json` にあります。
+
+```json
+{
+  "model": {
+    "name": "OpenVINO/gemma-4-E4B-it-int8-ov",
+    "local_dir": "model",
+    "download_source": "OpenVINO/gemma-4-E4B-it-int8-ov",
+    "max_context_length": 4096
+  },
+  "inference": {
+    "max_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 0.9
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000
+  }
+}
+```
+
+相対パスはリポジトリルートからの相対パスとして扱います。`server.port` は開始ポートであり、使用中の場合は次の空きポートを使います。
 
 ## API
-`POST /api/chat`
+
+### `GET /health`
+
+サーバーとモデルの状態を返します。
+
 ```json
-{"message":"Hello","max_tokens":256,"temperature":0.7,"top_p":0.9}
+{
+  "status": "ok",
+  "model_loaded": false,
+  "device": "AUTO:GPU,CPU"
+}
 ```
 
-Response:
+モデルはサーバー起動時には読み込まず、最初のチャット要求で遅延ロードします。
+
+### `POST /api/chat`
+
+リクエスト:
+
 ```json
-{"response":"Hi","inference_time":2.14,"tokens_generated":120}
+{
+  "message": "Hello",
+  "max_tokens": 512,
+  "temperature": 0.7,
+  "top_p": 0.9
+}
 ```
 
-Rules:
-- `response` はユーザー向けの回答だけを返す
-- `think`, `<think>...</think>`, `reasoning:` などの内部推論表示は UI/API に出さない
+レスポンス:
 
-## Project Map
-- `download.py`: モデルを準備
-- `run.py`: アプリ起動
-- `config.json`: モデル、推論、サーバー、デバイス設定
-- `app/`: FastAPI backend
-- `static/`: browser UI
-- `scripts/`: setup 用ヘルパー
-- `docs/`: 実装ルールと詳細仕様
+```json
+{
+  "response": "Hi",
+  "inference_time": 2.14,
+  "tokens_generated": 120
+}
+```
 
-## For Implementers
-最初に読む順番:
-1. `docs/requirements_definition.md`
-2. `docs/technical_specification.md`
-3. `docs/libraries.md`
-4. `docs/setup.md`
+`response` にはユーザーに見せる回答だけを入れます。`think`、`<think>...</think>`、`reasoning:`、`analysis:` などの内部推論マーカーは API と UI に出しません。
 
-実装方針:
-- 速く作るため、構成を増やさない
-- Python helper script でモデル準備の処理を小さく保つ
-- 変更した仕様は同じタスクで docs と README に反映する
+## 依存関係
+
+Gemma 4 対応のため、依存関係は意図的に固定しています。
+
+```toml
+openvino>=2026.1.0
+optimum-intel @ git+https://github.com/rkazants/optimum-intel.git@support_gemma_4
+transformers==5.5.0
+```
+
+標準のランタイム import は次の方針です。
+
+```python
+from optimum.intel.openvino import OVModelForVisualCausalLM
+from transformers import AutoProcessor
+```
+
+Gemma 4 の対応が公開版の `optimum-intel` と `transformers` に入ったことを確認できるまでは、この依存関係方針を維持します。
+
+## 開発メモ
+
+- アプリは小さく保つ
+- 複雑なフロントエンドフレームワークを追加しない
+- `uv run python ...` を使い、仮想環境の手動 activate に依存しない
+- モデルはサーバー起動時に読み込まず、最初のチャット要求で読み込む
+- チャット内容をクラウドへ送信する実装にしない
+- 仕様や挙動を変えた場合は、関連ドキュメントも同じ変更で更新する
+
+設計意図と UI 方針は `DESIGN.md` を参照してください。AI エージェント向けの作業ルールは `AGENTS.md` にあります。
+
+## スコープ外
+
+このプロジェクトでは、次の機能は扱いません。
+
+- ユーザー認証
+- クラウド同期
+- ストリーミング応答
+- 複数会話の永続履歴
+- 複雑なフロントエンドフレームワーク
