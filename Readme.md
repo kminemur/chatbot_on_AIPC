@@ -134,7 +134,7 @@ uv run python download.py OpenVINO/gemma-4-E4B-it-int8-ov
 
 ## 依存関係
 
-Gemma 4 対応のため、依存関係は意図的に固定しています。
+Gemma 4 対応のため、依存関係は意図的に固定しています。2026 年 7 月 17 日に公式モデルカードと公開パッケージを再確認し、`uv.lock` を最新の互換版で更新しています。
 
 ```toml
 openvino>=2026.1.0
@@ -149,7 +149,9 @@ from optimum.intel.openvino import OVModelForVisualCausalLM
 from transformers import AutoProcessor
 ```
 
-Gemma 4 の対応が公開版の `optimum-intel` と `transformers` に入ったことを確認できるまでは、この依存関係方針を維持します。
+現在のロックでは、主なパッケージは `openvino==2026.2.1`、対応ブランチの `optimum-intel==1.27.0.dev0+eac3893`、`transformers==5.5.0`、`torch==2.13.0` です。
+
+公開版 `optimum-intel==2.0.0` に Gemma 4 対応は入りましたが、配布メタデータが要求する `transformers>=4.45,<5.1` は、Gemma 4 が要求する `transformers>=5.5.0` と両立しません。公式モデルカードも引き続き上記のカスタムブランチと `transformers==5.5.0` を指定しているため、公開版だけへの移行はまだ行いません。この upstream の制約により、`uv pip check` は `optimum-intel` と `transformers` の1件の不一致を報告しますが、`uv` の override と同じ意図によるものです。
 
 ## 開発メモ
 
